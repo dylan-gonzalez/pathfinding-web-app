@@ -1,0 +1,55 @@
+class Tile {
+    constructor(x, y, templateElement, agentId) {
+        this.history = [Status.NONE];
+        this._status = Status.NONE;
+        this._agentId = null;
+        this.ALLOWED_TRANSITIONS = {
+            none: [Status.OBSTACLE, Status.START, Status.GOAL, Status.NONE],
+            obstacle: [Status.OBSTACLE, Status.NONE],
+            start: [Status.START, Status.NONE],
+            goal: [Status.GOAL],
+        };
+        this.x = x;
+        this.y = y;
+        this._agentId = agentId;
+        this.element = templateElement.cloneNode();
+        this.element.setAttribute("y", y.toString());
+        this.element.setAttribute("x", x.toString());
+    }
+    set status(status) {
+        if (status !== this._status) {
+            this.history.push(status);
+        }
+        // if (this.ALLOWED_TRANSITIONS[this._status.name].includes(status)) {
+        this._status = status;
+        this.element.setAttribute("fill", this._status.fillColor);
+        // } else {
+        // throw new Error("Invalid transition");
+        // }
+    }
+    set agentId(agentId) {
+        this._agentId = agentId;
+    }
+    get status() {
+        return this._status;
+    }
+    get agentId() {
+        return this._agentId;
+    }
+}
+class Status {
+    // private to disallow creating other instances of this type
+    constructor(value, name, fillColor) {
+        this.value = value;
+        this.name = name;
+        this.fillColor = fillColor;
+    }
+    toString() {
+        return this.value;
+    }
+}
+Status.NONE = new Status(0, "none", "white");
+Status.OBSTACLE = new Status(-1, "obstacle", "gray");
+Status.PATH = new Status(1, "path", "blue");
+Status.START = new Status(2, "start", "green");
+Status.GOAL = new Status(3, "goal", "red");

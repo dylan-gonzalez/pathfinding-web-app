@@ -1,0 +1,54 @@
+﻿@page
+@using WebApplication1.Models
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<svg id="map" width="1920" height="1080">
+      <defs>
+        <circle id="myCircle" cx="0" cy="0" r="5" />
+        <rect
+          class="tile"
+          x="330"
+          y="210"
+          width="30"
+          height="30"
+          r="0"
+          rx="0"
+          ry="0"
+          fill="#ffffff"
+          stroke="#000"
+          stroke-opacity="0.2"
+          style="
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            stroke-opacity: 0.2;
+          "
+        ></rect>
+      </defs>
+    </svg>
+
+    <div id="settings">
+      <label>Number of agents:</label>
+      <button onclick="adjustNoOfAgents(-1)">
+        <span class="material-icons">remove</span>
+      </button>
+      <span id="agents-quantity"></span>
+      <button onclick="adjustNoOfAgents(1)">
+        <span class="material-icons">add</span>
+      </button>
+    </div>
+
+    <button id="start-btn" onclick="start()">START</button>
+
+@section Scripts {
+    <environment include="Development">
+        <script src ="js/tile.js"></script>
+        <script src = "js/core.js"></script>
+        <script src="js/site.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="js/core.min.js" asp-append-version="true" defer></script>
+        <script src="js/site.min.js" asp-append-version="true" defer></script>
+    </environment>
+}
