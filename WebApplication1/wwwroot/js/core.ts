@@ -42,7 +42,9 @@ class Core {
 
 
 
-      let agent = new Agent(new State(10, 10, 0), new State(15, 15, 0), 1);
+      //let agent = new Agent(new State(10, 10, 0), new State(15, 15, 0), 1);
+        let agent = { startState: { x: 10, y: 10, time: 0 }, goalState: { x: 15, y: 15, time: 0 }, id: 1 }
+
       this.agents.push(agent);
 
     let startTile = this.grid[10][10];
@@ -91,7 +93,8 @@ class Core {
       //    }
       //}
 
-        let agent = new Agent(new State(0, 0, 0), new State(0, 1, 0), value);
+        //let agent = new Agent(new State(0, 0, 0), new State(0, 1, 0), value);
+        let agent = { startState: { x: 0, y: 0, time: 0 }, goalState: {x: 0, y: 1, time: 0}, id: value}
         this.grid[0][0].status = Status.START;
         this.grid[0][1].status = Status.GOAL;
 
@@ -170,9 +173,17 @@ class Core {
           newTile.status = this.settingTileType;
           newTile.agentId = oldTile.agentId;
           oldTile.status = oldTile.history[oldTile.history.length - 2];
-          oldTile.agentId = null;
+            oldTile.agentId = null;
 
-          console.log(newTile.agentId, oldTile.agentId);
+            console.log(newTile.agentId);
+
+            if (this.settingTileType === Status.START) {
+                this.agents[newTile.agentId - 1].startState = { x: coords.x, y: coords.y, time: 0 }
+            } else {
+                this.agents[newTile.agentId - 1].goalState = { x: coords.x, y: coords.y, time: 0 }
+            }
+
+            console.log(this.agents);
         } else {
           //disallow overriding start/goal state with obstacle/none state
           if (
@@ -217,6 +228,14 @@ class Core {
 
         return PathfindingRequestStatus.Ready; // Ready for sending request.
     }
+
+    public drawSolution(paths: Array<State[]>) {
+        paths.forEach(path => {
+            path.forEach(state => {
+                this.grid[state.y][state.x].status = Status.PATH;
+            })
+        })
+    }
 }
 
 interface Coords {
@@ -224,29 +243,43 @@ interface Coords {
   y: number;
 }
 
-class Agent {
-    startState: State;
-    goalState: State;
-    id: number;
-
-    public constructor(startState: State, goalState: State, id: number) {
-        this.startState = startState;
-        this.goalState = goalState;
-        this.id = id;
-    }
-}
-
-class State {
+interface State {
     x: number;
     y: number;
     time: number;
-
-    public constructor(x: number, y: number, time: number) {
-        this.x = x;
-        this.y = y;
-        this.time = time;
-    }
 }
+
+interface Agent {
+    startState: State;
+    goalState: State;
+    id: number;
+}
+
+
+
+//class Agent {
+//    startState: State;
+//    goalState: State;
+//    id: number;
+
+//    public constructor(startState: State, goalState: State, id: number) {
+//        this.startState = startState;
+//        this.goalState = goalState;
+//        this.id = id;
+//    }
+//}
+
+//class State {
+//    x: number;
+//    y: number;
+//    time: number;
+
+//    public constructor(x: number, y: number, time: number) {
+//        this.x = x;
+//        this.y = y;
+//        this.time = time;
+//    }
+//}
 
 enum PathfindingRequestStatus {
     None = 0,

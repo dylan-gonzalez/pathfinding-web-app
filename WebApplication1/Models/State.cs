@@ -5,11 +5,12 @@ using System.Security.Policy;
 using System.Text;
 
 namespace WebApplication1.Models
-{
+{   
     public class State
     {
-        public int x;
-        public int y;
+        public int x { get; set; }
+
+        public int y { get; set; }
 
         public int time { get; set; }
 

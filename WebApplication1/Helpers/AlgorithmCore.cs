@@ -11,6 +11,7 @@ namespace WebApplication1.Helpers
     {
         public static AlgorithmSolution Find (PathfindingSettings settings, int[][] map)
         {
+            Console.WriteLine("Finding");
             return Find(settings, map[0].Length, map.Length, GetStaticObstacles(map));
         }
 
@@ -20,30 +21,39 @@ namespace WebApplication1.Helpers
             var map = new Map(mapWidth, mapHeight, staticObstacles);
 
             //initialise all agents
-            //settings.agents.ForEach(agent =>
-            //{
-            //    var newAgent = new AStar();
-            //    newAgent.InitialisePathPlanner(map, agent.id, agent.startState, agent.goalState);
-            //    pathPlanners.Add(newAgent);
-            //});
+            settings.agents.ForEach(agent =>
+            {
+                var newAgent = new AStar();
+                newAgent.InitialisePathPlanner(map, agent.id, agent.startState, agent.goalState);
+                pathPlanners.Add(newAgent);
+            });
 
             //plan each agent's path, starting off with an empty list of constraints
             pathPlanners.ForEach(pathPlanner =>
             {
                 pathPlanner.PlanPath(pathPlanner.startState, new List<(State, int)>());
             });
-               
+
             //get the solution from conducting conflict based search
             var solution = CBS(pathPlanners);
 
+            //convert solution to a list of Agent types
+            List<Agent> newSolution = new List<Agent>();
+            solution.ForEach(agent =>
+            {
+                Agent newAgent = new Agent(agent.pathList, agent.agentId);
+                newSolution.Add(newAgent);
+            });
+
             return new AlgorithmSolution()
             {
-                solution = solution,
+                solution = newSolution,
             };
         }
 
         public static List<(List<State> pathList, int pathCost, int agentId)> CBS(List<IPathPlannable> pathPlanners)
         {
+            
             Comparison<ConstraintNode> comparisonF_n = new Comparison<ConstraintNode>((node2, node1) => node1.cost - node2.cost);
 
             DirectedGraph<ConstraintNode, DirectedEdge<ConstraintNode>> constraintTree = new DirectedGraph<ConstraintNode, DirectedEdge<ConstraintNode>>();
@@ -74,6 +84,11 @@ namespace WebApplication1.Helpers
             do
             {
                 var P = CTOpenList.Remove(); //node with lowest cost
+
+                if (P.solution.Count == 1)
+                {
+                    return P.solution;
+                }
 
                 List<Tuple<int, int, State>> conflicts = new List<Tuple<int, int, State>>();
 
@@ -186,8 +201,8 @@ namespace WebApplication1.Helpers
             {
                 for (int x = 0; x < map[y].Length; x++)
                 {
-                    if (map[y][x] == 1)
-                    {   //1 = obstacle, 0 = nothing
+                    if (map[y][x] == -1)
+                    {   //-1 = obstacle, 0 = nothing
                         staticObstacles.Add(new StaticObstacle(x, y));
                     }
                 }

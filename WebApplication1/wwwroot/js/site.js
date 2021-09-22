@@ -43,7 +43,16 @@ function start() {
             success: function (response) {
                 var solution = response.data.solution;
 
+                console.log("test");
+                console.log("Solution: ", solution);
+
+                solution = solution.map(agent => { return agent.path });
+
+                console.log("test")
+
                 console.log(solution);
+
+                core.drawSolution(solution)
 
             },
             error: function (jqXHR, textStatus, errorThrown) {

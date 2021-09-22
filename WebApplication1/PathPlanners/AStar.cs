@@ -107,8 +107,6 @@ namespace WebApplication1.PathPlanners
                 // Remove this state from the openList
 
                 var currentState = openList.Remove();
-                Console.WriteLine(currentState.x);
-                Console.WriteLine(currentState.y);
 
                 if (currentState.positionEqual(goalState, false))
                 {
@@ -169,7 +167,6 @@ namespace WebApplication1.PathPlanners
                     }
                 }
                 closedList.Add(currentState);       // Add currentState to closedList because it’s now fully explored, we’ve decided on a successor
-                Console.WriteLine("are we here yet?");
             } while (openList.Count != 0);                  // Do we need to initialise this count variable??
         }
     }

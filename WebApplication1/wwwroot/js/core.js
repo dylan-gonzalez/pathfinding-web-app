@@ -28,7 +28,8 @@ class Core {
                 this.map.appendChild(newTile.element);
             }
         }
-        let agent = new Agent(new State(10, 10, 0), new State(15, 15, 0), 1);
+        //let agent = new Agent(new State(10, 10, 0), new State(15, 15, 0), 1);
+        let agent = { startState: { x: 10, y: 10, time: 0 }, goalState: { x: 15, y: 15, time: 0 }, id: 1 };
         this.agents.push(agent);
         let startTile = this.grid[10][10];
         let goalTile = this.grid[15][15];
@@ -67,7 +68,8 @@ class Core {
             //        this.agents[tile.agentId - 1].goal = tile;
             //    }
             //}
-            let agent = new Agent(new State(0, 0, 0), new State(0, 1, 0), value);
+            //let agent = new Agent(new State(0, 0, 0), new State(0, 1, 0), value);
+            let agent = { startState: { x: 0, y: 0, time: 0 }, goalState: { x: 0, y: 1, time: 0 }, id: value };
             this.grid[0][0].status = Status.START;
             this.grid[0][1].status = Status.GOAL;
             this.agents.push(agent);
@@ -133,7 +135,14 @@ class Core {
                     newTile.agentId = oldTile.agentId;
                     oldTile.status = oldTile.history[oldTile.history.length - 2];
                     oldTile.agentId = null;
-                    console.log(newTile.agentId, oldTile.agentId);
+                    console.log(newTile.agentId);
+                    if (this.settingTileType === Status.START) {
+                        this.agents[newTile.agentId - 1].startState = { x: coords.x, y: coords.y, time: 0 };
+                    }
+                    else {
+                        this.agents[newTile.agentId - 1].goalState = { x: coords.x, y: coords.y, time: 0 };
+                    }
+                    console.log(this.agents);
                 }
                 else {
                     //disallow overriding start/goal state with obstacle/none state
@@ -170,21 +179,34 @@ class Core {
         body.map = grid_temp;
         return PathfindingRequestStatus.Ready; // Ready for sending request.
     }
-}
-class Agent {
-    constructor(startState, goalState, id) {
-        this.startState = startState;
-        this.goalState = goalState;
-        this.id = id;
+    drawSolution(paths) {
+        paths.forEach(path => {
+            path.forEach(state => {
+                this.grid[state.y][state.x].status = Status.PATH;
+            });
+        });
     }
 }
-class State {
-    constructor(x, y, time) {
-        this.x = x;
-        this.y = y;
-        this.time = time;
-    }
-}
+//class Agent {
+//    startState: State;
+//    goalState: State;
+//    id: number;
+//    public constructor(startState: State, goalState: State, id: number) {
+//        this.startState = startState;
+//        this.goalState = goalState;
+//        this.id = id;
+//    }
+//}
+//class State {
+//    x: number;
+//    y: number;
+//    time: number;
+//    public constructor(x: number, y: number, time: number) {
+//        this.x = x;
+//        this.y = y;
+//        this.time = time;
+//    }
+//}
 var PathfindingRequestStatus;
 (function (PathfindingRequestStatus) {
     PathfindingRequestStatus[PathfindingRequestStatus["None"] = 0] = "None";

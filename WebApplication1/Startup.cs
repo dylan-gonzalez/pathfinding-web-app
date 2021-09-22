@@ -7,7 +7,9 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 namespace WebApplication1
 {
@@ -25,6 +27,11 @@ namespace WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            //services.AddControllers().AddJsonOptions(x =>
+            //    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
+            services.AddControllers().AddNewtonsoftJson(x =>
+                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

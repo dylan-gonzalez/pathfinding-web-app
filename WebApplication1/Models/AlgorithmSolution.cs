@@ -7,7 +7,11 @@ namespace WebApplication1.Models
     {
 
         //Solution = path for each agent
-        public List<(List<State> pathList, int pathCost, int agentId)> solution { get; set; }
+        //public List<(List<State> pathList, int pathCost, int agentId)> solution { get; set; }
+        public List<Agent> solution { get; set; }
+
+        //public List<>
+        //public List<State> solution { get; set; }
 
     }
 }
