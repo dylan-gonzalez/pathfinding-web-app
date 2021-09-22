@@ -3,8 +3,6 @@ console.log(mapWidth);
 mapHeight = 20;
 noOfAgents = 1;
 
-var current = new PathfindingRequestBody();
-console.log(current);
 
 core = new Core(
     document.getElementById("map"),
@@ -13,10 +11,12 @@ core = new Core(
     mapHeight
 );
 
+var current = new PathfindingRequestBody();
+console.log(current);
+
+
 document.getElementById("agents-quantity").innerHTML = noOfAgents;
 function adjustNoOfAgents(qty) {
-    console.log("adjusting");
-
     if (qty == 1) {
         noOfAgents += 1;
     } else {
@@ -24,11 +24,10 @@ function adjustNoOfAgents(qty) {
             noOfAgents -= 1;
         }
     }
-    console.log(noOfAgents);
     core.noOfAgents = noOfAgents;
 
     //document.getElementById("agents-quantity").innerHTML = noOfAgents;
-    $("#agents-quantity").innerHTML = "test"
+    document.getElementById("agents-quantity").innerHTML = noOfAgents;
 }
 
 

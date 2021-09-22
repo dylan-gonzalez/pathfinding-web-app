@@ -7,15 +7,10 @@ class Core {
         this.map = map;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
-        // this.map.setAttribute(
-        //   "width",
-        //   (
-        //     Math.round(window.screen.width / this.tileSize) * this.tileSize
-        //   ).toString()
-        // );
-        this.map.setAttribute("width", "1350");
-        //this.map.setAttribute("height", Math.round((window.screen.height / this.tileSize) * this.tileSize).toString());
+        this.map.setAttribute("width", "2000");
         this.map.setAttribute("height", "650");
+        // this.map.setAttribute("width", (Math.round(window.screen.width / this.tileSize) * this.tileSize).toString());
+        //this.map.setAttribute("height", Math.round((window.screen.height / this.tileSize) * this.tileSize).toString());
         this.grid = new Array(mapHeight);
         //create grid
         for (let y = 0; y < mapHeight; y++) {
@@ -32,6 +27,7 @@ class Core {
         let agent = { startState: { x: 10, y: 10, time: 0 }, goalState: { x: 15, y: 15, time: 0 }, id: 1 };
         this.agents.push(agent);
         let startTile = this.grid[10][10];
+        console.log(this.map.getElementsByTagName("rect"));
         let goalTile = this.grid[15][15];
         startTile.status = Status.START;
         startTile.agentId = 1;
@@ -49,31 +45,30 @@ class Core {
         console.log("SET: ", value);
         let change = value - this._noOfAgents;
         if (change > 0) {
-            //add
-            let randomY = Math.floor(Math.random() * (this.grid.length - 1));
-            let randomX = Math.floor(Math.random() * (this.grid[0].length - 1)); //assuming this.grid is a square matrix
-            let tile = this.grid[randomY][randomX];
-            //for (let i = 0; i < 2; i++) {
-            //  while (tile.status.value >= 2) {
-            //    randomY = Math.floor(Math.random() * (this.grid.length - 1));
-            //    randomX = Math.floor(Math.random() * (this.grid[0].length - 1));
-            //    tile = this.grid[randomY][randomX];
-            //    }
-            //    tile.agentId = value;
-            //    if (i === 0) {
-            //        tile.status = Status.START;
-            //        console.log(tile.agentId)              
-            //    } else {
-            //        tile.status = Status.GOAL;
-            //        this.agents[tile.agentId - 1].goal = tile;
-            //    }
-            //}
-            //let agent = new Agent(new State(0, 0, 0), new State(0, 1, 0), value);
-            let agent = { startState: { x: 0, y: 0, time: 0 }, goalState: { x: 0, y: 1, time: 0 }, id: value };
-            this.grid[0][0].status = Status.START;
-            this.grid[0][1].status = Status.GOAL;
+            let agent = { startState: { x: null, y: null, time: 0 }, goalState: { x: null, y: null, time: 0 }, id: value };
+            let randomY, randomX, tile;
+            for (let i = 0; i < 2; i++) {
+                console.log(i == 0 ? "start" : "goal");
+                randomY = Math.floor(Math.random() * (this.grid.length - 1));
+                randomX = Math.floor(Math.random() * (this.grid[0].length - 1)); //assuming this.grid is a square matrix
+                console.log(randomX, randomY);
+                tile = this.grid[randomY][randomX];
+                while (tile.status !== Status.NONE) {
+                    randomY = Math.floor(Math.random() * (this.grid.length - 1));
+                    randomX = Math.floor(Math.random() * (this.grid[0].length - 1));
+                    tile = this.grid[randomY][randomX];
+                }
+                console.log("TILE: ", tile);
+                tile.status = i === 0 ? Status.START : Status.GOAL;
+                tile.agentId = value;
+                if (i === 0) {
+                    agent.startState = { x: randomX, y: randomY, time: 0 };
+                }
+                else {
+                    agent.goalState = { x: randomX, y: randomY, time: 0 };
+                }
+            }
             this.agents.push(agent);
-            console.log("added: ", this.agents);
         }
         else if (change < 0) {
             //remove
@@ -125,7 +120,12 @@ class Core {
     onMouseMove(event) {
         let oldTile;
         let coords = this.getCoords(event.clientX, event.clientY);
-        let newTile = this.grid[coords.y][coords.x];
+        let newTile;
+        try {
+            newTile = this.grid[coords.y][coords.x];
+        }
+        catch (_a) {
+        }
         if (this.currentTile !== newTile) {
             oldTile = this.currentTile;
             this.currentTile = newTile;
@@ -133,16 +133,16 @@ class Core {
                 if (this.settingTileType === Status.START || this.settingTileType === Status.GOAL) {
                     newTile.status = this.settingTileType;
                     newTile.agentId = oldTile.agentId;
+                    console.log("new Tile: ", newTile);
                     oldTile.status = oldTile.history[oldTile.history.length - 2];
                     oldTile.agentId = null;
-                    console.log(newTile.agentId);
                     if (this.settingTileType === Status.START) {
                         this.agents[newTile.agentId - 1].startState = { x: coords.x, y: coords.y, time: 0 };
                     }
                     else {
                         this.agents[newTile.agentId - 1].goalState = { x: coords.x, y: coords.y, time: 0 };
                     }
-                    console.log(this.agents);
+                    console.log("Updated agents list: ", this.agents);
                 }
                 else {
                     //disallow overriding start/goal state with obstacle/none state
